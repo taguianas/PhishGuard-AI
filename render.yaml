@@ -40,10 +40,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: ML_SERVICE_URL
-        fromService:
-          type: web
-          name: phishguard-ml
-          property: url
+        sync: false   # set to: https://phishguard-ml.onrender.com
       # ↓ Set manually in Render dashboard after first deploy
       - key: NEXTAUTH_SECRET
         sync: false
@@ -71,10 +68,7 @@ services:
       - key: NEXT_PUBLIC_GOOGLE_ENABLED
         value: "false"
       - key: BACKEND_URL
-        fromService:
-          type: web
-          name: phishguard-backend
-          property: url
+        sync: false   # set to: https://phishguard-backend.onrender.com
       # ↓ Set manually in Render dashboard after first deploy
       - key: NEXTAUTH_SECRET
         sync: false
