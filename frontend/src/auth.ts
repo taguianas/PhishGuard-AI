@@ -107,7 +107,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      if (token?.id) (session.user as Record<string, unknown>).id = token.id;
+      if (token?.id) (session.user as unknown as Record<string, unknown>).id = token.id;
       return session;
     },
   },
