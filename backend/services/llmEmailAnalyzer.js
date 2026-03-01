@@ -1,16 +1,19 @@
 /**
- * LLM-based email phishing classifier using Claude (claude-haiku-4-5 for speed + cost).
- * Requires ANTHROPIC_API_KEY in .env
+ * LLM-based email phishing classifier using Groq (free tier).
+ * Model: llama-3.1-8b-instant — fast, free, 14,400 req/day
+ * Get a free API key at: https://console.groq.com → API Keys
+ *
+ * Requires GROQ_API_KEY in .env
  */
-const Anthropic = require('@anthropic-ai/sdk');
+const Groq = require('groq-sdk');
 
 let client = null;
 
 function getClient() {
   if (!client) {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey || apiKey === 'your_anthropic_api_key_here') return null;
-    client = new Anthropic({ apiKey });
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey || apiKey === 'your_groq_api_key_here') return null;
+    client = new Groq({ apiKey });
   }
   return client;
 }
@@ -32,28 +35,37 @@ JSON schema:
  * @returns {{ verdict: string, confidence: number, summary: string, red_flags: string[] } | null}
  */
 async function classifyEmailWithLLM(emailText, senderDomain = '') {
-  const claude = getClient();
-  if (!claude) return null;
+  const groq = getClient();
+  if (!groq) return null;
 
-  // Truncate to 3000 chars to stay within token budget
   const truncated = emailText.slice(0, 3000);
-  const context = senderDomain ? `Sender domain: ${senderDomain}\n\n` : '';
+  const context   = senderDomain ? `Sender domain: ${senderDomain}\n\n` : '';
 
   try {
-    const message = await claude.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
       max_tokens: 300,
-      system: SYSTEM_PROMPT,
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
       messages: [
-        {
-          role: 'user',
-          content: `${context}Email content:\n${truncated}`,
-        },
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user',   content: `${context}Email content:\n${truncated}` },
       ],
     });
 
-    const raw = message.content[0]?.text?.trim();
-    return JSON.parse(raw);
+    const raw = completion.choices[0]?.message?.content?.trim();
+
+    // Strip markdown fences if present
+    let clean = raw.replace(/^```json?\n?/i, '').replace(/\n?```$/, '').trim();
+
+    // Extract the first {...} block in case the model adds extra text
+    const match = clean.match(/\{[\s\S]*\}/);
+    if (match) clean = match[0];
+
+    // Fix common invalid JSON escape sequences produced by LLMs
+    clean = clean.replace(/\\'/g, "'").replace(/\\([^"\\\/bfnrtu])/g, '$1');
+
+    return JSON.parse(clean);
   } catch (err) {
     console.error('[LLM] Classification error:', err.message);
     return null;

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import UserMenu from '@/components/UserMenu';
 
 export default function Nav() {
   return (
@@ -12,17 +13,22 @@ export default function Nav() {
           </div>
           <span className="font-bold text-slate-900 text-lg">PhishGuard</span>
         </Link>
-        <nav className="flex items-center gap-1">
-          <Link href="/url-analyzer" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-            URL Analyzer
-          </Link>
-          <Link href="/email-analyzer" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-            Email Analyzer
-          </Link>
-          <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-            Dashboard
-          </Link>
-        </nav>
+        <div className="flex items-center gap-1">
+          <nav className="flex items-center gap-1">
+            <Link href="/url-analyzer" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              URL Analyzer
+            </Link>
+            <Link href="/email-analyzer" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              Email Analyzer
+            </Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+              Dashboard
+            </Link>
+          </nav>
+          <div className="ml-4 pl-4 border-l border-slate-200">
+            <UserMenu />
+          </div>
+        </div>
       </div>
     </header>
   );

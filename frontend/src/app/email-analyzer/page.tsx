@@ -33,7 +33,7 @@ export default function EmailAnalyzerPage() {
     setResult(null);
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.BACKEND_URL}/api/email/analyze`, {
+      const res = await fetch('/api/analyze/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email_text: emailText, sender_domain: senderDomain || undefined }),
@@ -137,7 +137,7 @@ export default function EmailAnalyzerPage() {
           {/* LLM Verdict */}
           {result.llm_verdict && (
             <div className="p-6 border-t border-slate-100">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">AI Analysis (Claude)</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">AI Analysis (Groq / Llama 3.1)</p>
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border ${

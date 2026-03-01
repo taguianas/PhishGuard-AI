@@ -6,11 +6,13 @@ const { getDomainAge } = require('../threat-intel/domainAge');
 const { checkSafeBrowsing } = require('../threat-intel/safeBrowsing');
 const db = require('../database/db');
 const axios = require('axios');
+const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
 router.post(
   '/analyze',
+  requireAuth,
   [
     body('url')
       .trim()
@@ -91,7 +93,7 @@ router.post(
       ml_prediction: mlResult,
     };
 
-    db.saveUrlScan(response);
+    db.saveUrlScan({ ...response, user_id: req.user.id });
 
     return res.json(response);
   }

@@ -26,8 +26,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${process.env.BACKEND_URL}/api/history/stats`).then(r => r.json()),
-      fetch(`${process.env.BACKEND_URL}/api/history?limit=20`).then(r => r.json()),
+      fetch('/api/analyze/history?type=stats').then(r => r.json()),
+      fetch('/api/analyze/history?limit=20').then(r => r.json()),
     ])
       .then(([s, h]) => { setStats(s); setHistory(h); })
       .catch(() => {})

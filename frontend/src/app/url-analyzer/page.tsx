@@ -27,7 +27,7 @@ export default function URLAnalyzerPage() {
     setResult(null);
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.BACKEND_URL}/api/url/analyze`, {
+      const res = await fetch('/api/analyze/url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),

@@ -42,36 +42,47 @@ db.exec(`
   );
 `);
 
+// Add user_id column to existing tables (safe to run every startup)
+['url_scans', 'email_scans'].forEach(table => {
+  try { db.exec(`ALTER TABLE ${table} ADD COLUMN user_id TEXT`); } catch (_) {}
+});
+
+// Create indexes after columns are guaranteed to exist
+db.exec(`
+  CREATE INDEX IF NOT EXISTS idx_url_scans_user_id   ON url_scans(user_id);
+  CREATE INDEX IF NOT EXISTS idx_email_scans_user_id ON email_scans(user_id);
+`);
+
 // --- URL scans ---
 const insertUrlScan = db.prepare(`
-  INSERT INTO url_scans (url, risk_score, classification, reasons, threat_intel, domain_age, safe_browsing, ml_prediction)
-  VALUES (@url, @risk_score, @classification, @reasons, @threat_intel, @domain_age, @safe_browsing, @ml_prediction)
+  INSERT INTO url_scans (url, risk_score, classification, reasons, threat_intel, domain_age, safe_browsing, ml_prediction, user_id)
+  VALUES (@url, @risk_score, @classification, @reasons, @threat_intel, @domain_age, @safe_browsing, @ml_prediction, @user_id)
 `);
 
 const getUrlHistory = db.prepare(`
   SELECT id, url, risk_score, classification, reasons, created_at
-  FROM url_scans ORDER BY created_at DESC LIMIT ?
+  FROM url_scans WHERE user_id = ? ORDER BY created_at DESC LIMIT ?
 `);
 
 // --- Email scans ---
 const insertEmailScan = db.prepare(`
-  INSERT INTO email_scans (sender_domain, risk_score, classification, reasons, urls_found, llm_verdict)
-  VALUES (@sender_domain, @risk_score, @classification, @reasons, @urls_found, @llm_verdict)
+  INSERT INTO email_scans (sender_domain, risk_score, classification, reasons, urls_found, llm_verdict, user_id)
+  VALUES (@sender_domain, @risk_score, @classification, @reasons, @urls_found, @llm_verdict, @user_id)
 `);
 
 const getEmailHistory = db.prepare(`
   SELECT id, sender_domain, risk_score, classification, reasons, created_at
-  FROM email_scans ORDER BY created_at DESC LIMIT ?
+  FROM email_scans WHERE user_id = ? ORDER BY created_at DESC LIMIT ?
 `);
 
-// --- Dashboard stats ---
-const getStats = db.prepare(`
+// --- Dashboard stats (per user) ---
+const getStatsStmt = db.prepare(`
   SELECT
-    (SELECT COUNT(*) FROM url_scans)  +
-    (SELECT COUNT(*) FROM email_scans) AS total_scans,
-    (SELECT COUNT(*) FROM url_scans  WHERE classification = 'High Risk') +
-    (SELECT COUNT(*) FROM email_scans WHERE classification = 'High Risk') AS high_risk_count,
-    (SELECT COUNT(DISTINCT url) FROM url_scans WHERE classification != 'Low Risk') AS flagged_urls
+    (SELECT COUNT(*) FROM url_scans  WHERE user_id = ?) +
+    (SELECT COUNT(*) FROM email_scans WHERE user_id = ?) AS total_scans,
+    (SELECT COUNT(*) FROM url_scans  WHERE classification = 'High Risk' AND user_id = ?) +
+    (SELECT COUNT(*) FROM email_scans WHERE classification = 'High Risk' AND user_id = ?) AS high_risk_count,
+    (SELECT COUNT(DISTINCT url) FROM url_scans WHERE classification != 'Low Risk' AND user_id = ?) AS flagged_urls
 `);
 
 module.exports = {
@@ -85,6 +96,7 @@ module.exports = {
       domain_age:    JSON.stringify(data.domain_age),
       safe_browsing: JSON.stringify(data.safe_browsing),
       ml_prediction: JSON.stringify(data.ml_prediction),
+      user_id:       data.user_id || null,
     });
   },
 
@@ -96,14 +108,15 @@ module.exports = {
       reasons:        JSON.stringify(data.reasons),
       urls_found:     JSON.stringify(data.urls),
       llm_verdict:    data.llm_verdict ? JSON.stringify(data.llm_verdict) : null,
+      user_id:        data.user_id || null,
     });
   },
 
-  getHistory(limit = 20) {
-    const urls   = getUrlHistory.all(limit).map(r => ({
+  getHistory(userId, limit = 20) {
+    const urls   = getUrlHistory.all(userId, limit).map(r => ({
       ...r, type: 'url', reasons: JSON.parse(r.reasons),
     }));
-    const emails = getEmailHistory.all(limit).map(r => ({
+    const emails = getEmailHistory.all(userId, limit).map(r => ({
       ...r, type: 'email', reasons: JSON.parse(r.reasons),
     }));
     return [...urls, ...emails]
@@ -111,7 +124,7 @@ module.exports = {
       .slice(0, limit);
   },
 
-  getStats() {
-    return getStats.get();
+  getStats(userId) {
+    return getStatsStmt.get(userId, userId, userId, userId, userId);
   },
 };

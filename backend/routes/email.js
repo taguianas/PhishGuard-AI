@@ -3,11 +3,13 @@ const { body, validationResult } = require('express-validator');
 const { analyzeEmail } = require('../services/emailAnalyzer');
 const { classifyEmailWithLLM } = require('../services/llmEmailAnalyzer');
 const db = require('../database/db');
+const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
 router.post(
   '/analyze',
+  requireAuth,
   [
     body('email_text')
       .trim()
@@ -22,6 +24,7 @@ router.post(
       .withMessage('sender_domain must be a valid domain'),
   ],
   async (req, res) => {
+    try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -33,7 +36,10 @@ router.post(
     // Run heuristics + LLM in parallel
     const [heuristics, llm_verdict] = await Promise.all([
       Promise.resolve(analyzeEmail(email_text, sender_domain)),
-      classifyEmailWithLLM(email_text, sender_domain).catch(() => null),
+      classifyEmailWithLLM(email_text, sender_domain).catch((e) => {
+        console.error('[email route] LLM error:', e.message);
+        return null;
+      }),
     ]);
 
     // Boost score if LLM says phishing with high confidence
@@ -60,9 +66,13 @@ router.post(
       llm_verdict,
     };
 
-    db.saveEmailScan(result);
+    db.saveEmailScan({ ...result, user_id: req.user.id });
 
     return res.json(result);
+    } catch (err) {
+      req.logger?.error({ event: 'email_scan_error', message: err.message, stack: err.stack });
+      return res.status(500).json({ error: 'Internal server error' });
+    }
   }
 );
 
