@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+*.log
+logs/
+.next/
+dist/
+__pycache__/
+*.pyc
+model.pkl
+data/
+venv/
+.DS_Store
