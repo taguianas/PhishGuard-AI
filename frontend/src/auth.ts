@@ -6,13 +6,18 @@ import { neon } from '@neondatabase/serverless';
 import { authConfig } from '@/auth.config';
 
 // ── Neon PostgreSQL (users table) ─────────────────────────────────────────────
-const sql = neon(process.env.DATABASE_URL!);
+// Lazy init — neon() is called only at request time, not at build time
+let _sql: ReturnType<typeof neon> | null = null;
+function getDb() {
+  if (!_sql) _sql = neon(process.env.DATABASE_URL!);
+  return _sql;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 type UserRow = { id: string; email: string; name: string | null; password: string | null; image: string | null };
 
 export async function getUserByEmail(email: string): Promise<UserRow | undefined> {
-  const rows = await sql`SELECT * FROM users WHERE email = ${email}`;
+  const rows = await getDb()`SELECT * FROM users WHERE email = ${email}`;
   return rows[0] as UserRow | undefined;
 }
 
@@ -23,11 +28,11 @@ export async function createUser(
   passwordHash: string | null,
   image: string | null
 ): Promise<void> {
-  await sql`INSERT INTO users (id, name, email, password, image) VALUES (${id}, ${name}, ${email}, ${passwordHash}, ${image})`;
+  await getDb()`INSERT INTO users (id, name, email, password, image) VALUES (${id}, ${name}, ${email}, ${passwordHash}, ${image})`;
 }
 
 export async function getUserById(id: string): Promise<UserRow | undefined> {
-  const rows = await sql`SELECT * FROM users WHERE id = ${id}`;
+  const rows = await getDb()`SELECT * FROM users WHERE id = ${id}`;
   return rows[0] as UserRow | undefined;
 }
 
