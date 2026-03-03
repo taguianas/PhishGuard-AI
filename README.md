@@ -36,7 +36,7 @@ phish-guard/
 
 **Data storage:**
 - `backend/data/phishguard.db` : SQLite scan history (url_scans, email_scans), filtered by user
-- `frontend/data/auth.db` : SQLite user accounts (email/password via bcrypt, Google OAuth)
+- **Neon PostgreSQL** : user accounts (email/password via bcrypt, Google OAuth) — persistent across deploys
 
 ---
 
@@ -94,7 +94,7 @@ npm run dev                        # http://localhost:3000
 
 PhishGuard requires a user account to access any page or API endpoint.
 
-- **Email + password** registration and login (bcrypt-hashed, stored in `frontend/data/auth.db`)
+- **Email + password** registration and login (bcrypt-hashed, stored in Neon PostgreSQL)
 - **Google OAuth** : enable by setting `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `frontend/.env.local`
 - **Session strategy:** JWT (NextAuth v5, `authjs.session-token` cookie)
 - **Route protection:** Next.js middleware redirects unauthenticated requests to `/login`, preserving `?callbackUrl`
@@ -227,7 +227,8 @@ Built by `build_dataset.py` using two sources:
 |----------|-------------|
 | `NEXTAUTH_SECRET` | **Required** : shared JWT secret (same value as backend) |
 | `NEXTAUTH_URL` | Frontend URL (default `http://localhost:3000`) |
-| `NEXT_PUBLIC_BACKEND_URL` | Backend URL for server-side proxy routes |
+| `BACKEND_URL` | Backend URL for server-side proxy routes (default `http://localhost:4000`) |
+| `DATABASE_URL` | **Required** : Neon PostgreSQL connection string for user accounts |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID (leave blank to disable Google login) |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `NEXT_PUBLIC_GOOGLE_ENABLED` | Set to `true` to show Google login button |
@@ -249,6 +250,29 @@ Use the same value in both `backend/.env` and `frontend/.env.local`.
 5. Copy the key into `backend/.env` as `GOOGLE_SAFE_BROWSING_API_KEY`
 
 Free quota: **10,000 requests/day** : no billing required.
+
+---
+
+## Render Deployment
+
+A `render.yaml` is included for one-click deployment of all three services (frontend, backend, ML service) to [Render](https://render.com).
+
+After the first deploy, set these environment variables in the Render dashboard:
+
+| Service | Variable | Value |
+|---------|----------|-------|
+| Frontend | `BACKEND_URL` | `https://phishguard-backend.onrender.com` (no trailing slash) |
+| Frontend | `DATABASE_URL` | Your Neon PostgreSQL connection string |
+| Frontend | `NEXTAUTH_SECRET` | Same secret as backend |
+| Frontend | `NEXTAUTH_URL` | `https://phishguard-frontend.onrender.com` |
+| Backend | `NEXTAUTH_SECRET` | Same secret as frontend |
+| Backend | `ALLOWED_ORIGINS` | `https://phishguard-frontend.onrender.com` |
+| Backend | `ML_SERVICE_URL` | `https://phishguard-ml.onrender.com` |
+| Backend | `VIRUSTOTAL_API_KEY` | Your VirusTotal API key |
+| Backend | `GOOGLE_SAFE_BROWSING_API_KEY` | Your Safe Browsing API key |
+| Backend | `GROQ_API_KEY` | Your Groq API key |
+
+> **Free tier note:** Render free services spin down after 15 minutes of inactivity. The first request after sleep may take ~30 seconds to respond while the service wakes up.
 
 ---
 
@@ -333,3 +357,5 @@ See `tests/REPORT.md` for the full test report.
 - [x] Chrome browser extension (Manifest V3)
 - [x] User authentication (NextAuth.js v5 : email/password + Google OAuth)
 - [x] End-to-end test suite (57 tests, all passing)
+- [x] Render deployment (render.yaml : frontend + backend + ML service)
+- [x] Neon PostgreSQL for persistent user accounts across deploys
