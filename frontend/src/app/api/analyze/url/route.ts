@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 
-const BACKEND = process.env.BACKEND_URL || 'http://localhost:4000';
+const BACKEND = (process.env.BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
 
 export async function POST(req: NextRequest) {
   const session = await auth();
