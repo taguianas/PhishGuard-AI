@@ -1,0 +1,82 @@
+# Render deployment — https://render.com/docs/render-yaml-spec
+#
+# Three services, all on the free plan:
+#   phishguard-ml        FastAPI + XGBoost   (Python)
+#   phishguard-backend   Express + SQLite    (Node.js)
+#   phishguard-frontend  Next.js + NextAuth  (Node.js)
+#
+# After first deploy, set these env vars in the Render dashboard:
+#   NEXTAUTH_SECRET            — same value in both backend and frontend
+#   NEXTAUTH_URL               — https://phishguard-frontend.onrender.com
+#   ALLOWED_ORIGINS            — https://phishguard-frontend.onrender.com
+#   VIRUSTOTAL_API_KEY         — from virustoal.com
+#   GOOGLE_SAFE_BROWSING_API_KEY
+#   GROQ_API_KEY               — from console.groq.com (free)
+
+services:
+
+  # ── ML Service (FastAPI + XGBoost) ──────────────────────────────────────────
+  - type: web
+    name: phishguard-ml
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: ml-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+
+  # ── Backend (Express + JWT auth) ─────────────────────────────────────────────
+  - type: web
+    name: phishguard-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ML_SERVICE_URL
+        sync: false   # set to: https://phishguard-ml.onrender.com
+      # ↓ Set manually in Render dashboard after first deploy
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: GOOGLE_SAFE_BROWSING_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+
+  # ── Frontend (Next.js 16 + NextAuth v5) ──────────────────────────────────────
+  - type: web
+    name: phishguard-frontend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_GOOGLE_ENABLED
+        value: "false"
+      - key: BACKEND_URL
+        sync: false   # set to: https://phishguard-backend.onrender.com
+      # ↓ Set manually in Render dashboard after first deploy
+      - key: DATABASE_URL
+        sync: false   # set to your Neon connection string
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

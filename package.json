@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev:webpack",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:start": "npm --prefix frontend run start:3000",
+    "backend:dev": "npm --prefix backend run dev",
+    "ml:dev": "py -3.12 -m uvicorn main:app --host 127.0.0.1 --port 8000 --app-dir ml-service"
+  },
+  "dependencies": {
+    "framer-motion": "^12.38.0"
+  }
+}
