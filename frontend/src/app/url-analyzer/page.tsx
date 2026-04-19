@@ -148,17 +148,22 @@ export default function URLAnalyzerPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {presets.map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => setUrl(preset)}
-                className="app-chip transition hover:border-cyan-300/24 hover:text-white"
-              >
-                sample route
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Demo:</span>
+            {presets.map((preset) => {
+              let label = preset;
+              try { label = new URL(preset).hostname; } catch { /* use raw */ }
+              return (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setUrl(preset)}
+                  className="app-chip transition hover:border-cyan-300/24 hover:text-white"
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </form>
       </div>

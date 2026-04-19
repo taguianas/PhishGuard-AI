@@ -83,7 +83,7 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="app-label">Name</label>
+            <label className="app-label">Name <span className="normal-case tracking-normal text-slate-500">(optional)</span></label>
             <input
               type="text"
               value={name}

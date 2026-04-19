@@ -191,10 +191,24 @@ export default function AttachmentAnalyzerPage() {
             )}
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-col items-end gap-2">
             <button type="submit" disabled={!file || loading} className="app-primary-btn min-w-[220px]">
-              {loading ? 'Inspecting Container...' : 'Analyze Attachment'}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="flex gap-1">
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current" />
+                  </span>
+                  Inspecting Container
+                </span>
+              ) : (
+                'Analyze Attachment'
+              )}
             </button>
+            {loading && (
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-400">This may take a few seconds...</p>
+            )}
           </div>
         </form>
       </div>

@@ -106,7 +106,7 @@ export default function EmailAnalyzerPage() {
       <div className="app-panel p-6 md:p-7">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="app-label">Sender domain</label>
+            <label className="app-label">Sender domain <span className="normal-case tracking-normal text-slate-500">(optional)</span></label>
             <input
               type="text"
               value={senderDomain}

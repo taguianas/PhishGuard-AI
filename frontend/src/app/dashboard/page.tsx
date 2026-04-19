@@ -63,20 +63,7 @@ export default function DashboardPage() {
     [loading, stats]
   );
 
-  const sidebarRows: ScanRecord[] =
-    history.slice(0, 4).length > 0
-      ? history.slice(0, 4)
-      : [
-          {
-            id: 0,
-            type: 'url',
-            url: 'awaiting-history.local',
-            risk_score: 0,
-            classification: 'Low Risk',
-            reasons: [],
-            created_at: new Date().toISOString(),
-          },
-        ];
+  const sidebarRows = history.slice(0, 4);
 
   if (!session && status !== 'loading') {
     return (
@@ -195,15 +182,28 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="space-y-3">
-            {sidebarRows.map((row) => (
-              <div key={`${row.type}-${row.id}`} className="rounded-[20px] border border-white/10 bg-white/[0.04] px-4 py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs uppercase tracking-[0.22em] text-slate-400">{row.type}</span>
-                  <span className="text-sm font-semibold text-white">{row.risk_score}</span>
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-[20px] border border-white/10 bg-white/[0.04] px-4 py-3 animate-pulse">
+                  <div className="h-3 w-12 rounded bg-white/[0.08]" />
+                  <div className="mt-2 h-3 w-36 rounded bg-white/[0.08]" />
                 </div>
-                <p className="mt-2 truncate font-mono text-xs text-slate-200">{row.url || row.sender_domain || 'waiting...'}</p>
+              ))
+            ) : sidebarRows.length > 0 ? (
+              sidebarRows.map((row) => (
+                <div key={`${row.type}-${row.id}`} className="rounded-[20px] border border-white/10 bg-white/[0.04] px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs uppercase tracking-[0.22em] text-slate-400">{row.type}</span>
+                    <span className="text-sm font-semibold text-white">{row.risk_score}</span>
+                  </div>
+                  <p className="mt-2 truncate font-mono text-xs text-slate-200">{row.url || row.sender_domain || '—'}</p>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-[20px] border border-white/10 bg-white/[0.04] px-4 py-4 text-center">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-500">No scans yet</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       }

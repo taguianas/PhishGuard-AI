@@ -1,9 +1,5 @@
 # Webapp Design Extraction
 
-This file captures the **design, structure, layout, visual system, and component breakdown** of the provided webapp screenshot. It focuses on **UI design and composition**, not textual OCR fidelity.
-
----
-
 ## 1. Overall Visual Identity
 
 - **Theme:** Dark-mode SaaS landing page / product marketing site.
