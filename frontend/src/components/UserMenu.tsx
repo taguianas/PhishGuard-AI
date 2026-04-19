@@ -20,9 +20,10 @@ export default function UserMenu() {
   }
 
   const user = session.user;
-  const initials = user?.name
-    ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
-    : user?.email?.[0]?.toUpperCase() ?? '?';
+  const initials =
+    (user?.name
+      ? user.name.split(' ').map((n) => n[0]).filter(Boolean).join('').toUpperCase().slice(0, 2)
+      : user?.email?.[0]?.toUpperCase()) || '?';
 
   return (
     <motion.div

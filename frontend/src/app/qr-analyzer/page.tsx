@@ -35,7 +35,7 @@ interface QRResult {
 const ACCEPTED = '.png,.jpg,.jpeg,.gif,.bmp,.webp,.tiff,.tif';
 const MAX_MB = 10;
 
-const CONTENT_TYPE_LABELS: Record<string, string> = {
+const CONTENT_TYPE_LABELS: Record<QRCode['content_type'], string> = {
   url: 'URL',
   wifi: 'Wi-Fi Config',
   email: 'Email Address',
@@ -46,7 +46,7 @@ const CONTENT_TYPE_LABELS: Record<string, string> = {
   text: 'Plain Text',
 };
 
-const CONTENT_TYPE_COLORS: Record<string, string> = {
+const CONTENT_TYPE_COLORS: Record<QRCode['content_type'], string> = {
   url: 'border-cyan-300/24 bg-cyan-400/10 text-cyan-100',
   wifi: 'border-sky-300/24 bg-sky-400/10 text-sky-100',
   email: 'border-fuchsia-300/24 bg-fuchsia-400/10 text-fuchsia-100',

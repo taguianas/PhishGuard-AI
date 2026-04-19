@@ -29,7 +29,7 @@ export default function ToolPageShell({
 }: ToolPageShellProps) {
   return (
     <section className="app-container py-10 md:py-14">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
         <Reveal className="app-panel p-8 md:p-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,0.14),transparent_42%)]" />
           <div className="relative z-10 space-y-6">
