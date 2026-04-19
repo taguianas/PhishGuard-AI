@@ -266,7 +266,7 @@ export default function QRAnalyzerPage() {
 
             {preview ? (
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {/* blob: URLs are not supported by next/image — plain img is correct here */}
                 <img src={preview} alt={file?.name ? `Preview of ${file.name}` : 'Uploaded image preview'} className="h-24 w-24 rounded-[22px] border border-white/10 bg-slate-950/60 object-contain" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-lg font-semibold text-white">{file?.name}</p>

@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import clsx from 'clsx';
 
 interface RevealProps {
@@ -21,12 +21,14 @@ export function Reveal({
   duration = 0.72,
   once = true,
 }: RevealProps) {
+  const reduced = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y }}
+      initial={reduced ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, amount: 0.2 }}
-      transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: reduced ? 0 : duration, delay: reduced ? 0 : delay, ease: [0.16, 1, 0.3, 1] }}
       className={className}
     >
       {children}
@@ -39,13 +41,15 @@ export function FloatingPanel({
   className,
   delay = 0,
 }: Omit<RevealProps, 'y' | 'duration' | 'once'>) {
+  const reduced = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 26, scale: 0.98 }}
+      initial={reduced ? false : { opacity: 0, y: 26, scale: 0.98 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -6, scale: 1.01 }}
+      transition={{ duration: reduced ? 0 : 0.8, delay: reduced ? 0 : delay, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={reduced ? undefined : { y: -6, scale: 1.01 }}
       className={clsx(className)}
     >
       {children}

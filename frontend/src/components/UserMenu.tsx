@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useSession, signOut } from 'next-auth/react';
@@ -34,8 +35,7 @@ export default function UserMenu() {
     >
       <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-2 py-2">
       {user?.image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={user.image} alt="Profile" className="h-9 w-9 rounded-full border border-white/[0.12] object-cover" />
+        <Image src={user.image} alt="Profile" width={36} height={36} className="h-9 w-9 rounded-full border border-white/[0.12] object-cover" />
       ) : (
         <div className="flex h-9 w-9 select-none items-center justify-center rounded-full border border-cyan-300/[0.24] bg-cyan-300/[0.12] text-xs font-bold text-cyan-100">
           {initials}
