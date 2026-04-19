@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   title: 'PhishGuard | AI Threat Observatory',
   description: 'A dark-mode phishing defense console for URLs, emails, QR payloads, and malicious attachments.',
   authors: [{ name: 'Anas TAGUI' }],
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' },
+    ],
+    shortcut: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
