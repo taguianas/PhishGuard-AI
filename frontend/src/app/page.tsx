@@ -516,16 +516,19 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(open ? -1 : index)}
+                    aria-expanded={open}
+                    aria-controls={`faq-answer-${index}`}
                     className="flex w-full items-center justify-between gap-4 text-left"
                   >
                     <span className="text-lg font-medium text-white">{item.question}</span>
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-cyan-100">
+                    <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-cyan-100">
                       {open ? '−' : '+'}
                     </span>
                   </button>
                   <AnimatePresence initial={false}>
                     {open && (
                       <motion.div
+                        id={`faq-answer-${index}`}
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}

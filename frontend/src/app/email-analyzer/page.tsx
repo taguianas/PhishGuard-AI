@@ -117,12 +117,15 @@ export default function EmailAnalyzerPage() {
           </div>
 
           <div>
-            <label className="app-label">Email content</label>
+            <label className="app-label">
+              Email content <span className="normal-case tracking-normal text-rose-400/80">*</span>
+            </label>
             <textarea
               value={emailText}
               onChange={(e) => setEmailText(e.target.value)}
               placeholder="Paste the full email body and headers if available..."
               required
+              aria-required="true"
               rows={11}
               className="app-textarea font-mono"
             />

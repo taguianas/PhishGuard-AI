@@ -41,6 +41,7 @@ export default function Nav() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={active ? 'page' : undefined}
                   className={clsx(
                     'group relative inline-flex shrink-0 items-center rounded-full p-1 text-[13px] font-medium transition sm:text-sm',
                     active ? 'text-slate-950' : 'text-slate-300/[0.78]'

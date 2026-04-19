@@ -43,5 +43,5 @@ export default function BrandMark({
     </div>
   );
 
-  return <Link href={href}>{content}</Link>;
+  return <Link href={href} aria-label="PhishGuard — go to home page">{content}</Link>;
 }
