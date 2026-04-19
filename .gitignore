@@ -11,3 +11,4 @@ __pycache__/
 data/
 venv/
 .DS_Store
+.webapp_design_extraction.md
